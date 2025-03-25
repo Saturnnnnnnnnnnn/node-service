@@ -35,7 +35,7 @@ jobs:
       # 5. Log in to ArgoCD through the SSH tunnel
       - name: Log in to ArgoCD
         run: |
-          argocd login http://localhost:8080 --username ${{ secrets.ARGOCD_USERNAME }} --password ${{ secrets.ARGOCD_PASSWORD }} --insecure
+          argocd login localhost:8080 --username ${{ secrets.ARGOCD_USERNAME }} --password ${{ secrets.ARGOCD_PASSWORD }} --insecure
 
       # 6. Sync application in ArgoCD
       - name: Sync application in ArgoCD
