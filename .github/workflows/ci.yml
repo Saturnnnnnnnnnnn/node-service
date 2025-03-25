@@ -32,26 +32,28 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        
+
+      - name: Bump version and push tag
+        id: tag
+        uses: mathieudutour/github-tag-action@v6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: major
+
       - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
-      
-      - name: Get the version based on Git tag or commit SHA
-        id: version
-        run: |
-          VERSION=$(git describe --tags --always --abbrev=0)
-          if [[ "$VERSION" == "v"* ]]; then
-            VERSION=${VERSION:1}
-          fi
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:$VERSION"
-          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
-      - name: Build Docker image with version
-        run: docker build -t ${{ env.IMAGE_NAME }} .
+      - name: Build and tag Docker image
+        run: |
+          VERSION=${{ steps.tag.outputs.new_tag }}
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:$VERSION .
+          docker tag ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:$VERSION ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
 
       - name: Push Docker image
-        run: docker push ${{ env.IMAGE_NAME }}
+        run: |
+          VERSION=${{ steps.tag.outputs.new_tag }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:$VERSION
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
