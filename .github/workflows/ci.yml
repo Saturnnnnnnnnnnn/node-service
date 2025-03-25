@@ -50,10 +50,8 @@ jobs:
         run: |
           VERSION=${{ steps.tag.outputs.new_tag }}
           docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:$VERSION .
-          docker tag ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:$VERSION ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
 
       - name: Push Docker image
         run: |
           VERSION=${{ steps.tag.outputs.new_tag }}
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:$VERSION
-          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
