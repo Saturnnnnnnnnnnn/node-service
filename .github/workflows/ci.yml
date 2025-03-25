@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      
+        
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
@@ -32,15 +32,26 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      
+        
       - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
       
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:1.0.0 .
-      
+      - name: Get the version based on Git tag or commit SHA
+        id: version
+        run: |
+          VERSION=$(git describe --tags --always --abbrev=0)
+          if [[ "$VERSION" == "v"* ]]; then
+            VERSION=${VERSION:1}
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:$VERSION"
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
+
+      - name: Build Docker image with version
+        run: docker build -t ${{ env.IMAGE_NAME }} .
+
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:1.0.0
+        run: docker push ${{ env.IMAGE_NAME }}
