@@ -1,10 +1,7 @@
-name: CI/CD Pipeline
+name: CI Pipeline
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
@@ -14,12 +11,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        
+
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '14'
-      
+
       - name: Install dependencies
         run: npm install
 
@@ -33,13 +30,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Bump version and push tag
-        id: tag
-        uses: mathieudutour/github-tag-action@v6.2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          default_bump: major
-
       - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
@@ -48,10 +38,30 @@ jobs:
 
       - name: Build and tag Docker image
         run: |
-          VERSION=${{ steps.tag.outputs.new_tag }}
+          VERSION=$(date +'%Y%m%d%H%M%S')  # Используем текущий timestamp для версии
           docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:$VERSION .
 
       - name: Push Docker image
         run: |
-          VERSION=${{ steps.tag.outputs.new_tag }}
+          VERSION=$(date +'%Y%m%d%H%M%S')
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:$VERSION
+
+  update-manifest:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Update Docker image tag in Kubernetes manifests
+        run: |
+          VERSION=$(date +'%Y%m%d%H%M%S')
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:$VERSION|" k8s/manifests/deployment.yaml
+
+      - name: Commit and push updated manifests
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add k8s/manifests/deployment.yaml
+          git commit -m "Update Docker image tag to $VERSION"
+          git push
