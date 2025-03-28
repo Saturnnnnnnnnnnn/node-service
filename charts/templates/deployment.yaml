@@ -16,10 +16,6 @@ spec:
     spec:
       containers:
         - name: info-system-service
-<<<<<<< HEAD:charts/templates/deployment.yaml
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-=======
-          image: saturn0912/node-service:20250325213123
->>>>>>> fe6455cca9e31d60002f8aeefc3037910d52df11:k8s/manifests/deployment.yaml
           ports:
             - containerPort: {{ .Values.service.targetPort }}
