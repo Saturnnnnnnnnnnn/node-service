@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: info-system-service
+  name: {{ include "info-system-service.fullname" . }}
   labels:
     app: info-system-service
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: info-system-service
@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: info-system-service
-          image: saturn0912/node-service:20250325212238
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           ports:
-            - containerPort: 3002
+            - containerPort: {{ .Values.service.targetPort }}

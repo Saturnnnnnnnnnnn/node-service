@@ -36,23 +36,9 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Build, tag, and push Docker image
+      - name: Build and push Docker image
         run: |
-          VERSION=$(date +'%Y%m%d%H%M%S')
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          IMAGE=${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:$VERSION
+          IMAGE=${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:1.0.0
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
           docker build -t $IMAGE .
           docker push $IMAGE
-
-      - name: Update Kubernetes manifest
-        run: |
-          sed -i "s|image: .*|image: $IMAGE|" k8s/manifests/deployment.yaml
-
-      - name: Commit and push updated manifests
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git add k8s/manifests/deployment.yaml
-          git commit -m "Update Docker image to $IMAGE"
-          git push

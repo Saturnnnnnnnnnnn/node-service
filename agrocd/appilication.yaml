@@ -6,13 +6,13 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/Saturnnnnnnnnnnn/node-service.git'
-    targetRevision: main
-    path: k8s-manifests
+    repoURL: git@github.com:Saturnnnnnnnnnnn/node-service.git
+    targetRevision: HEAD
+    path: charts
   destination:
     server: https://kubernetes.default.svc
     namespace: default
   syncPolicy:
     automated:
-      selfHeal: true
       prune: true
+      selfHeal: true

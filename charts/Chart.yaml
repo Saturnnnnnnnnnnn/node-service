@@ -1,0 +1,5 @@
+apiVersion: v2
+name: info-system-service
+description: A Helm chart for deploying info-system-service
+version: 0.1.0
+appVersion: "1.0.0"
