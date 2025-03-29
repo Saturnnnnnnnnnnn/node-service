@@ -29,10 +29,10 @@ app.get('/', (req, res) => {
   res.send(`
     <html>
       <head>
-        <title>Информация о вашей системе</title>
+        <title>Node Service</title>
       </head>
       <body>
-        <h1>Информация о системе</h1>
+        <h1>Информация о вашей системе</h1>
         <p><strong>Имя хоста:</strong> ${systemInfo.hostname}</p>
         <p><strong>Тип ОС:</strong> ${systemInfo.os_type}</p>
         <p><strong>Платформа:</strong> ${systemInfo.platform}</p>
