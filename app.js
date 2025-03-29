@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
   res.send(`
     <html>
       <head>
-        <title>Информация о системе</title>
+        <title>Информация о вашей системе</title>
       </head>
       <body>
         <h1>Информация о системе</h1>
