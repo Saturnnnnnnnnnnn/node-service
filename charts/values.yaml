@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: saturn0912/node-service
-  tag: "1.0.0"
+  tag: "12fb8b6795190af92a814698313a513a0f0146fe"
   pullPolicy: IfNotPresent
 
 service:
